@@ -1,5 +1,5 @@
 # KORGNanoKontrol
-supercollider classes for the KORG NanoKONTROL2, based slightly on the QuNeo quark 
+supercollider classes for the KORG NanoKONTROL2, based on the QuNeo quark 
 
 
 a few classes for conveniently dealing with the korg nanokontrol
