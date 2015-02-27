@@ -11,7 +11,7 @@ KORGButton {
 
 		func0 = {};
 		func127 = {};
-		ctrl = MIDIFunc.cc( { arg ... val;
+		ctrl = MIDIFunc.cc( { arg val;
 
 			switch ( val,
 				127, func127.value(),
