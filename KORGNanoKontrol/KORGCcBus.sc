@@ -5,37 +5,34 @@ This control registers a function to update a bus from a specific CC message/Cha
 Includes shotcuts for map, value and creating a Ugen from the bus
 */
 
-MidiCcBus{
-	var <cc, <channel, <scInPort, <scOutPort, <name;
-	var <bus, displayDebugInfo, <>func, <>mappingFunc;
+KORGCcBus {
+	var <cc, <channel, <scInPort, <name;
+	var <bus, <def, displayDebugInfo, <>func, <>mappingFunc;
 
-	*new{|cc, channel = 0, scInPort, scOutPort, name, mappingFunc|
+	*new{ arg cc, channel = 0, scInPort, name;
 		^super
-			.newCopyArgs(cc, channel, scInPort, scOutPort, name, mappingFunc)
-			.init()
+		.newCopyArgs(cc, channel, scInPort, name)
+		.init()
 	}
 
 	init{
 		func = {};
 		mappingFunc = {arg x; x/127};
-		if(cc.notNil, {
+		if(cc.notNil && channel.notNil && scInPort.notNil, {
 			bus = Bus.control(Server.default, 1);
 
 
 
 			//Set bus value.  Divide by 127 to normalize to 0..1
-					MIDIdef.cc(name,
-						{|val, num, chan, src|
-							if (chan == channel, {
-						bus.set(mappingFunc.value(val));
-						func.value(mappingFunc.value(val), num, chan, src, name, displayDebugInfo);
-								if(displayDebugInfo == true, {bus.get{|val|(name ++ ': ' ++ val).postln}});
-							});
-						},
-						ccNum: cc,
-						chan: channel
-						//,srcID: scInPort
-					).permanent = true;
+			def = MIDIdef.cc(name, { arg val;
+				this.bus.set(this.mappingFunc.value(val));
+				func.value(val);
+				},
+				ccNum: cc,
+				chan: channel,
+				srcID: scInPort
+			);
+			def.permanent = true;
 		});
 	}
 

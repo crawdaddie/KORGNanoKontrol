@@ -1,5 +1,5 @@
 KORGMapper {
-	var <defaultChannel, <scInPort, <scOutPort, <knobs, <sliders, <buttons;
+	var <defaultChannel, <scInPort, <knobs, <sliders, <buttons;
 
 	*new { arg defaultChannel = 0;
 		^super
@@ -12,7 +12,6 @@ KORGMapper {
 		if(MIDIClient.sources.isNil, {MIDIIn.connect});
 		//Find nanoKONTROL in and out ports
 		if(scInPort.isNil, {scInPort = this.detectInPort});
-		if(scOutPort.isNil, {scOutPort = this.detectOutPort});
 
 		knobs = Array.newClear(8);
 		sliders = Array.newClear(8);
@@ -24,7 +23,7 @@ KORGMapper {
 
 	postInfo {
 		''.postln;
-		('nanoKONTROL2: In - ' ++ scInPort ++ ' / Out - ' ++ scOutPort).postln;
+		('nanoKONTROL2: In - ' ++ scInPort).postln;
 		(Char.tab ++ 'knobs - ' ++ knobs.size).postln;
 		(Char.tab ++ 'sliders - ' ++ sliders.size).postln;
 		(Char.tab ++ 'buttons - ' ++ buttons.size).postln;
@@ -38,28 +37,27 @@ KORGMapper {
 
 
 
-	detectInPort{^(MIDIClient.sources.detect({|item| item.device.find("nanoKONTROL2").notNil}) !? _.uid ? 0);}
-
-	detectOutPort{^(MIDIClient.destinations.detect({|item| item.device.find("nanoKONTROL2").notNil}) !? _.uid ? 0);}
+	detectInPort{^(MIDIClient.sources.detect({arg item;
+		item.device.find("nanoKONTROL2").notNil}) !? _.uid ? 0);}
 
 
 	createKnob { arg index, cc, channel;
 		var name = \knob ++ '_' ++ index;
 		if(channel.isNil, {channel = defaultChannel});
-		knobs = knobs.put(index, KORGControl(cc, name, channel, scInPort, scOutPort));
+		knobs = knobs.put(index, KORGControl(cc, name, channel, scInPort));
 
 	}
 
 	createSlider { arg index, cc, channel;
 		var name = \slider ++ '_' ++ index;
 		if(channel.isNil, {channel = defaultChannel});
-		sliders = sliders.put(index, KORGControl(cc, name, channel, scInPort, scOutPort));
+		sliders = sliders.put(index, KORGControl(cc, name, channel, scInPort));
 	}
 
-	createButton { arg index, cc, channel, func;
+	createButton { arg index, cc, channel;
 		var name = \button ++ '_' ++ index;
 		if(channel.isNil, {channel = defaultChannel});
-		buttons = buttons.put(index, KORGButton(cc, name, channel, scInPort, scOutPort));
+		buttons = buttons.put(index, KORGButton(cc, name, channel, scInPort));
 
 
 	}
