@@ -7,7 +7,7 @@ Includes shotcuts for map, value and creating a Ugen from the bus
 
 KORGCcBus {
 	var <cc, <channel, <scInPort, <name;
-	var <bus, <def, displayDebugInfo, <>func, <>mappingFunc;
+	var <bus, <def, displayDebugInfo, <>func, <>mappingFunc, <value;
 
 	*new{ arg cc, channel = 0, scInPort, name;
 		^super
@@ -16,8 +16,8 @@ KORGCcBus {
 	}
 
 	init{
-		func = {};
-		mappingFunc = {arg x; x/127};
+		func = { arg x; x/127};
+		mappingFunc = { arg x; x/127};
 		if(cc.notNil && channel.notNil && scInPort.notNil, {
 			bus = Bus.control(Server.default, 1);
 
@@ -26,7 +26,7 @@ KORGCcBus {
 			//Set bus value.  Divide by 127 to normalize to 0..1
 			def = MIDIdef.cc(name, { arg val;
 				this.bus.set(this.mappingFunc.value(val));
-				func.value(val);
+				value = func.value(val);
 				},
 				ccNum: cc,
 				chan: channel,
@@ -34,6 +34,8 @@ KORGCcBus {
 			);
 			def.permanent = true;
 		});
+		value !? {value = 0};
+
 	}
 
 	//Set to display debug values to the console
@@ -46,7 +48,7 @@ KORGCcBus {
 
 
 	//Returns the current bus value
-	value{^bus.getSynchronous;}
+	//value{^this.value}
 
 	//Returns an OutputProxy mapped to the bus to use it inside of SynthDefs
 	//Range is normalized from 0 to 1
