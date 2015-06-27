@@ -1,5 +1,5 @@
 KORGMapper {
-	var <defaultChannel, <scInPort, <knobs, <sliders, <buttons;
+	var <defaultChannel, <scInPort, <knobs, <sliders, <buttons, <transport;
 
 	*new { arg defaultChannel = 0;
 		^super
@@ -16,6 +16,7 @@ KORGMapper {
 		knobs = Array.newClear(8);
 		sliders = Array.newClear(8);
 		buttons = Array.newClear(24);
+		transport = Array.newClear(11); // Transport controls on the left
 
 		this.postInfo;
 
@@ -29,13 +30,6 @@ KORGMapper {
 		(Char.tab ++ 'buttons - ' ++ buttons.size).postln;
 		''.postln;
 	}
-
-
-
-
-
-
-
 
 	detectInPort{^(MIDIClient.sources.detect({arg item;
 		item.device.find("nanoKONTROL2").notNil}) !? _.uid ? 0);}
@@ -58,9 +52,14 @@ KORGMapper {
 		var name = \button ++ '_' ++ index;
 		if(channel.isNil, {channel = defaultChannel});
 		buttons = buttons.put(index, KORGButton(cc, name, channel, scInPort));
-
-
 	}
+
+	createTransport { arg index, cc, channel;
+		var name = \transport ++ '_' ++ index;
+		if(channel.isNil, {channel = defaultChannel});
+		transport = transport.put(index, KORGButton(cc, name, channel, scInPort));
+	}
+
 
 	setup {
 
@@ -112,6 +111,25 @@ KORGMapper {
 		this.createButton(22, 55);
 		this.createButton(23, 71);
 
+		// Transport buttons are marked top left to bottom right
+		this.createTransport(0,58);
+		this.createTransport(1,59);
+		this.createTransport(2,46);
+		this.createTransport(3,60);
+		this.createTransport(4,61);
+		this.createTransport(5,62);
+		this.createTransport(6,43);
+		this.createTransport(7,44);
+		this.createTransport(8,42);
+		this.createTransport(9,41);
+		this.createTransport(10,45);
+
+	}
+
+	dict {
+		MIDIdef.all.postSorted;
+		MIDIdef.all.know = true;
+		^MIDIdef.all
 	}
 
 
